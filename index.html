@@ -34,6 +34,24 @@
   .guide-body p{color:var(--muted);font-size:14px;margin:0 0 14px}
   .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px;font-size:13px}
   .legend b{color:var(--acc)}
+  .guide-confirm{display:flex;align-items:flex-start;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font-size:13.5px;font-weight:600;cursor:pointer;color:var(--ink)}
+  .guide-confirm input{margin-top:2px;width:16px;height:16px;accent-color:var(--acc);cursor:pointer;flex:0 0 auto}
+  .cols-wrap{position:relative}
+  .cols-wrap .cols.locked{filter:blur(2.5px);opacity:.55;pointer-events:none;user-select:none}
+  .lock-overlay{display:none;position:absolute;inset:0;align-items:center;justify-content:center;z-index:4}
+  .lock-overlay.show{display:flex}
+  .lock-msg{background:var(--ink);color:#fff;font-size:13.5px;font-weight:600;padding:14px 22px;border-radius:12px;box-shadow:var(--shadow);text-align:center;max-width:320px}
+  .example-pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+  .example-card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--panel)}
+  .example-title{font-size:12.5px;font-weight:700;margin-bottom:6px;line-height:1.4}
+  .example-sub{font-size:12px;color:var(--muted);margin:0 0 10px;line-height:1.5}
+  .example-mini{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:12.5px;align-items:baseline;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+  .example-mini span{color:var(--muted)}
+  .example-mini b{text-align:right;font-weight:600}
+  .example-mini .tot{color:var(--ink);font-weight:700;border-top:1px solid var(--line);padding-top:6px;margin-top:2px}
+  .example-mini b.tot{border-top:1px solid var(--line);padding-top:6px;margin-top:2px;color:var(--acc)}
+  .example-note{font-size:12px;color:var(--muted);margin:0;line-height:1.5}
+  @media(max-width:560px){.example-pair{grid-template-columns:1fr}}
 
   .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch}
   @media(max-width:900px){.cols{grid-template-columns:1fr}}
@@ -157,21 +175,56 @@
 
 <div class="wrap">
 
-  <details class="guide">
+  <details class="guide" open>
 
     <summary><span class="chev"></span>Where do I find these numbers? (open me first)</summary>
     <div class="guide-body">
-      <p>For each card type you'll need: net sales, the total MSF charged, and the interchange and scheme portions of that fee (your statement will break these out separately). Group the lines into the four card types below and copy across the totals. Ignore the minus signs.</p>
+      <p>For each card type you'll need four figures: net sales, the total MSF (merchant service fee) charged, and the interchange and scheme portions of that fee. Every provider shows these slightly differently, but the same four numbers are always there. Two common formats below — find the one closer to your statement.</p>
+
+      <div class="example-pair">
+        <div class="example-card">
+          <div class="example-title">Format A &mdash; statement breaks down interchange, scheme and acquiring</div>
+          <p class="example-sub">Your statement lists Net Sales, Interchange, Scheme and Margin as separate columns for each card type.</p>
+          <div class="example-mini">
+            <span>Net sales</span><b>$101,512.63</b>
+            <span>Interchange</span><b>$537.66</b>
+            <span>Scheme</span><b>$121.82</b>
+            <span>Margin</span><b>$245.96</b>
+            <span class="tot">Total MSF</span><b class="tot">$905.44</b>
+          </div>
+          <p class="example-note">Copy Net sales straight across. Add Interchange + Scheme + Margin to get Total MSF (or copy the total if your statement already shows one).</p>
+        </div>
+
+        <div class="example-card">
+          <div class="example-title">Format B &mdash; statement breaks down interchange, scheme and acquiring + intl</div>
+          <p class="example-sub">Your statement writes the fee out as a running total per card type, with each component named and its rate shown alongside it, rather than as separate columns.</p>
+          <div class="example-mini">
+            <span>Net sales</span><b>$50,000.00</b>
+            <span>Interchange</span><b>$250.00</b>
+            <span>Scheme</span><b>$60.00</b>
+            <span>Acquiring + Intl fee</span><b>$120.00</b>
+            <span class="tot">Total MSF</span><b class="tot">$430.00</b>
+          </div>
+          <p class="example-note">Take the interchange and scheme amounts as named. Add together every other fee on that line (acquiring, margin, international loading, or similar) into one combined figure. Interchange + Scheme + that combined figure is your Total MSF.</p>
+        </div>
+      </div>
+
       <div class="legend">
         <span><b>Visa Domestic</b> = Visa debit + credit (local)</span>
         <span><b>Mastercard Domestic</b> = Mastercard debit + credit (local)</span>
         <span><b>Visa / Mastercard International</b> = overseas-issued cards</span>
       </div>
       <p style="margin-top:14px">This calculator covers Mastercard, Visa, DCC and EFTPOS only. Other payment types — Discover, UnionPay, Amex — are not included in the calculation.</p>
+
+      <label class="guide-confirm">
+        <input type="checkbox" id="guide-ack">
+        <span>I've read the guide above and understand how to fill in the fields below.</span>
+      </label>
     </div>
   </details>
 
-  <div class="cols">
+  <div class="cols-wrap">
+    <div class="cols" id="inputCols">
 
     <!-- CURRENT -->
     <section class="card" id="currentCard">
@@ -263,6 +316,10 @@
         </div>
       </div>
     </section>
+    </div>
+    <div class="lock-overlay" id="lockOverlay">
+      <div class="lock-msg">&#128274; Tick the box in the guide above to unlock these fields.</div>
+    </div>
   </div>
 
   <div class="actions">
@@ -433,7 +490,24 @@
     }
   },true);
 
+  // Guide gate — fields locked until the user confirms they've read the guide
+  var guideAck=document.getElementById('guide-ack');
+  var inputCols=document.getElementById('inputCols');
+  var lockOverlay=document.getElementById('lockOverlay');
+  var calcBtn=document.getElementById('calculate');
+  function applyLock(){
+    var locked=!guideAck.checked;
+    inputCols.classList.toggle('locked',locked);
+    lockOverlay.classList.toggle('show',locked);
+    calcBtn.disabled=locked;
+    calcBtn.style.opacity=locked?'.5':'';
+    calcBtn.style.cursor=locked?'not-allowed':'';
+  }
+  guideAck.addEventListener('change',applyLock);
+  applyLock();
+
   document.getElementById('calculate').addEventListener('click',function(){
+    if(!guideAck.checked) return;
     calculate();
     document.getElementById('result').scrollIntoView({behavior:'smooth',block:'center'});
   });
